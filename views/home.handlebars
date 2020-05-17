@@ -19,6 +19,7 @@
     transition: 0.5s ease;
     cursor: pointer;
     text-align: center;
+    padding: 0%;
     }
 
     .card-image{
@@ -45,30 +46,58 @@
         display: inline-flex;
         margin: 20px;
     }
-</style>
+    .button {
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  padding: 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+}
 
+    .button3 {border-radius: 8px;}
+
+body {
+  background: -webkit-linear-gradient(left, #FFF 20px, transparent 1%) center, -webkit-linear-gradient(#FFF 20px, transparent 1%) center, rgb(88, 88, 88);
+  background: linear-gradient(90deg, #FFF 20px, transparent 1%) center, linear-gradient(#FFF 20px, transparent 1%) center, rgb(88, 88, 88);
+  background-size: 22px 22px;
+}
+
+
+</style>
+<div style="background-color: #FFF;">
+<div class="row " style="float:right; padding-right:10%">
+    <form action="/history" method="post">
+        <button class="button button3" name="submit" type="submit" value="submit" >History</button>
+    </form>
+    </div>
+    </div>
 <div class="container align-center">
-    <div class="row justify-content-center">
+    
+    <div class="row justify-content-center" style="background-color: #FFF;">
         <h1>Movie Recommendation System</h1>
     </div>
     <div class="vertical-center-row">
      <div class="row justify-content-center">
-         <div class="col-5">
+         <div class="col-5"style="background-color: #FFF;">
   <!-- Content here -->
             {{!-- <div class="mx-auto" style="width: 50vmax; height: 50vmax; "> --}}
-                <form action="/submitMovieName" method="post">
+                <form action="/submitMovieName" method="post" >
                  <div class="input-group mb-3">
-                    <input type="text" class="form-control" name="movieName" placeholder="Enter movie name" aria-label="movie name" aria-describedby="button-addon2">
+                    <input type="text" class="form-control" name="movieName" placeholder="Enter the name of your favorite movie" aria-label="movie name" aria-describedby="button-addon2" >
                         <div class="input-group-append">
-                            <button class="btn btn-outline-secondary" name="submit" type="submit" value="submit" id="button-addon2">Button</button>
+                            <button class="btn btn-outline-secondary" name="submit" type="submit" value="submit" id="button-addon2">Recommend</button>
                         </div>
                     </div>
                         </div>
 
             </div>
             </div>
-                    
-            <div class="row justify-content-center" style="flex-direction: row;">
+                    <div style="background-color: #FFF;">
+            <div class="row justify-content-center" style="flex-direction: row;" >
                 <div class="col form-check">
                     <input type="checkbox" name="Comedy" value="Comedy" class="form-check-input" id="Comedy">
                     <label class="form-check-label" for="exampleCheck1">Comedy</label>
@@ -86,7 +115,7 @@
                     <label class="form-check-label" for="exampleCheck1">Thriller</label>
                 </div>
                 <div class="col form-check">
-                    <input type="checkbox" name="Sci-Fi" value="Sci-Fi" class="form-check-input" id="Sci-Fi">
+                    <input type="checkbox" name="SciFi" value="SciFi" class="form-check-input" id="SciFi">
                     <label class="form-check-label" for="exampleCheck1">Sci-Fi</label>
                 </div>
                 <div class="col form-check">
@@ -132,7 +161,7 @@
                     <label class="form-check-label" for="exampleCheck1">Adventure</label>
                 </div>
             </div>
-                
+                </div>
             </form>
             
             <div class="row justify-content-center">

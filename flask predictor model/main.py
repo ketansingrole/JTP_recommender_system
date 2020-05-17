@@ -28,21 +28,14 @@ class KnnRecommender:
         self.movie_rating_thres = movie_rating_thres
         self.user_rating_thres = user_rating_thres
 
-    def set_model_params(self, n_neighbors, algorithm, metric, n_jobs=None):
-        if n_jobs and (n_jobs > 1 or n_jobs == -1):
-            os.environ['JOBLIB_TEMP_FOLDER'] = '/tmp'
-        self.model.set_params(**{
-            'n_neighbors': n_neighbors,
-            'algorithm': algorithm,
-            'metric': metric,
-            'n_jobs': n_jobs})
-
     def _prep_data(self):
         # read data
         df_movies = pd.read_csv(
             os.path.join(self.path_movies),
             usecols=['movieId', 'title'],
             dtype={'movieId': 'int32', 'title': 'str'})
+
+            #reading csv and passing data to use the coulmn
         df_ratings = pd.read_csv(
             os.path.join(self.path_ratings),
             usecols=['userId', 'movieId', 'rating'],
@@ -80,6 +73,15 @@ class KnnRecommender:
         # print("Movie user sparse matrix \n",movie_user_mat_sparse)
         # print("Hashmap \n",hashmap)
         return movie_user_mat_sparse, hashmap
+
+    def set_model_params(self, n_neighbors, algorithm, metric, n_jobs=None):
+        if n_jobs and (n_jobs > 1 or n_jobs == -1):
+            os.environ['JOBLIB_TEMP_FOLDER'] = '/tmp'
+        self.model.set_params(**{
+            'n_neighbors': n_neighbors,
+            'algorithm': algorithm,
+            'metric': metric,
+            'n_jobs': n_jobs})
 
     def _fuzzy_matching(self, hashmap, fav_movie):
         match_tuple = []

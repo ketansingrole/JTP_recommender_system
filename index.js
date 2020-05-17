@@ -6,7 +6,7 @@ const bodyParser = require('body-parser');
 const request = require('request');
 
 
-// var User = require('./schema/user');
+var history = require('./schema/history');
 var exphbs  = require('express-handlebars');
 
 
@@ -30,68 +30,83 @@ app.get('/',(req,res) => {
     // .catch(err => res.status(404).json({ msg: 'No items found' }));
 });
 
+app.post('/history',  (req,res) => {
+    try {
+                history.find().lean()
+            .then(history_list => {
+                console.log(JSON.stringify(history_list))
+
+                // temp = JSON.stringify(history_list)
+
+                // res.send(history);
+
+                // console.log(history)
+                
+                // let history_list =  JSON.stringify(history)
+                // let history_list = JSON.parse(history.toString())
+
+                // history_list = JSON.stringify(history);
+                res.render('history',{
+                    history :  history_list
+                });
+                
+               
+               
+            }).catch(err => {
+                res.status(500).send({
+                    message: err.message || "Some error occurred while retrieving notes."
+                });
+            });
+            
+            // history.find().lean().then(history => {
+            //     console.log(JSON.stringify(history));
+            // }
+        
+    } catch (error) {
+        console.log(error);
+    }
+});
+
 app.post('/submitMovieName',  (req,res) => {
    console.log(req.body.movieName);
    console.log(req.body.Comedy);
    console.log(req.body.Musical);
 
+    let filter = [req.body.Comedy,req.body.Musical,req.body.Romance,req.body.Thriller,req.body.SciFi,req.body.Mystery,req.body.Crime,req.body.Action,req.body.Horror,req.body.Fantasy,req.body.Documentary,req.body.War,req.body.Animation,req.body.Children,req.body.Adventure];
+    
+    let filter_string = ""
+    console.log(filter.length)
 
-   fetch("http://predictor:5000/predict?movieName="+req.body.movieName+"&filter_list=" , function(error, meta, body){
-        //  fetch("http://127.0.0.1:5000/predict?movieName="+req.body.movieName+"&filter_list=" , function(error, meta, body){
+    for(let i=0;i<filter.length;i++){
+        if(filter[i] === undefined){
+
+        }else{
+            filter_string += filter[i]+","
+        }
+    }
+
+    console.log("filter string is: ", filter_string)
+
+
+   fetch("http://predictor:5000/predict?movieName="+req.body.movieName+"&filter_list="+filter_string+"" , function(error, meta, body){
+        //  fetch("http://127.0.0.1:5000/predict?movieName="+req.body.movieName+"&filter_list="+filter_string+"" , function(error, meta, body){
         try {
             console.error("ERROR in request: ", error);
                 console.log(body.toString());
                 let movieNames = JSON.parse(body.toString())
-                // res.status(200).json({"response": "ok", "data": JSON.parse(body.toString())})
-                // web scrapping url example https://www.imdb.com/find?q=Iron+Man
-                // let results = [];
-
-                //   async.mapLimit(movieNames, 1, function(movie, callback) {
-
-                //     google.scrape(movie, 1).then((result) => {
-                //         console.log("Result: ", result)
-                //         callback();
-                //     }).catch((error) => {
-                //         console.error("Inside ERROR: ", error)
-                //         callback();
-                //     });
-
-                //   }, function(error, result)  {
-                //       console.log(error, result)
-                //       if (error) {
-                //           console.error("Outside ERROR: ", error)
-                //       } else {
-                //           console.log(result);
-                //       }
-                //   })
-                    // const results = await google.scrape("Django Unchained", 1);
-                    // console.log('results', results);
-                  
-                //   console
-
-                // for (let i = 0; i < movieNames.length; i++) {
-                //     console.log(movieNames[i]);
-                //     //Do something
-                //    (async () => {
-                //     results.push(google.scrape(movieNames[i], 1));
-                //     })();
-                // }
-                // Promise.all(results).then((response)=>{
-                //     console.log(response);
-                // })
-                // console.log('results', results);
-                // for await (movie of movieNames) {
-                //     (async () => {
-                //             const results = await google.scrape("Django Unchained (2012)", 1);
-                //             console.log('results', results);
-                //             })();
-                //   }
-                    
-
 
                 res.render('home',{
                     movieList : movieNames
                 });
+
+                const newItem = new history({
+                    //   name: "ketan"
+                        name: req.body.movieName,
+                        recommendation: body.toString()
+                    });
+                  
+                    newItem.save().then();
+
         } catch (error) {
             console.log(error)
             let movieNames =  [{"name":"This movie is not in database try another movie","url":""}]
@@ -101,7 +116,11 @@ app.post('/submitMovieName',  (req,res) => {
             
         }
 
+        
+
     })
+
+
 });
 
 app.post('/item/add', (req, res) => {

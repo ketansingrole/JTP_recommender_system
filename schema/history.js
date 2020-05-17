@@ -5,11 +5,9 @@ mongoose.connect('mongodb://mongo-app:27017', { useNewUrlParser: true})
 .then(() => console.log('Mongodb connected'))
 .catch(err => console.log(err));
 
-const userSchema = mongoose.Schema({
+const history = mongoose.Schema({
     name:String,
-    age:String,
-    state:String,
-    country:String
+    recommendation:String,
 });
 
-module.exports = mongoose.model('User',userSchema);
+module.exports = mongoose.model('history',history);
