@@ -1,0 +1,166 @@
+<style>
+    .container {
+        padding-top: 25vmin;
+    }
+    .row{
+        padding: 10px;
+    }
+
+    .card{
+       display: grid;
+    grid-template-columns: 200px;
+    grid-template-rows: 250px;
+    grid-template-areas: "image" "text";
+    font-family: robot;
+    border-radius: 18px;
+    background-color: white;
+    box-shadow: 5px 5px 15px rgba(0,0,0,0.9);
+    margin: inherit;
+    transition: 0.5s ease;
+    cursor: pointer;
+    text-align: center;
+    }
+
+    .card-image{
+        grid-area: image;
+        border-top-left-radius: 15px;
+        border-top-right-radius: 15px;
+        background-size:cover;
+    }
+
+    .card-text{
+        display: grid;
+        grid-area: text;
+        align-content: center;
+        margin: 25px;
+        padding: 10px;
+    }
+
+    .card:hover{
+        transform: scale(1.1);
+        box-shadow: 5px 5px 15px rgba(0,0,0,0.6);
+    }
+
+    ul{
+        display: inline-flex;
+        margin: 20px;
+    }
+</style>
+
+<div class="container align-center">
+    <div class="row justify-content-center">
+        <h1>Movie Recommendation System</h1>
+    </div>
+    <div class="vertical-center-row">
+     <div class="row justify-content-center">
+         <div class="col-5">
+  <!-- Content here -->
+            {{!-- <div class="mx-auto" style="width: 50vmax; height: 50vmax; "> --}}
+                <form action="/submitMovieName" method="post">
+                 <div class="input-group mb-3">
+                    <input type="text" class="form-control" name="movieName" placeholder="Enter movie name" aria-label="movie name" aria-describedby="button-addon2">
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" name="submit" type="submit" value="submit" id="button-addon2">Button</button>
+                        </div>
+                    </div>
+                        </div>
+
+            </div>
+            </div>
+                    
+            <div class="row justify-content-center" style="flex-direction: row;">
+                <div class="col form-check">
+                    <input type="checkbox" name="Comedy" value="Comedy" class="form-check-input" id="Comedy">
+                    <label class="form-check-label" for="exampleCheck1">Comedy</label>
+                </div>
+                <div class="col form-check">
+                    <input type="checkbox" name="Musical" value="Musical" class="form-check-input" id="Musical">
+                    <label class="form-check-label" for="exampleCheck1">Musical</label>
+                </div>
+                <div class="col form-check">
+                    <input type="checkbox" name="Romance" value="Romance" class="form-check-input" id="Romance">
+                    <label class="form-check-label" for="exampleCheck1">Romance</label>
+                </div>
+                <div class="col form-check">
+                    <input type="checkbox" name="Thriller" value="Thriller" class="form-check-input" id="Thriller">
+                    <label class="form-check-label" for="exampleCheck1">Thriller</label>
+                </div>
+                <div class="col form-check">
+                    <input type="checkbox" name="Sci-Fi" value="Sci-Fi" class="form-check-input" id="Sci-Fi">
+                    <label class="form-check-label" for="exampleCheck1">Sci-Fi</label>
+                </div>
+                <div class="col form-check">
+                    <input type="checkbox" name="Mystery" value="Mystery" class="form-check-input" id="Mystery">
+                    <label class="form-check-label" for="exampleCheck1">Mystery</label>
+                </div>
+                <div class="col form-check">
+                    <input type="checkbox" name="Crime" value="Crime" class="form-check-input" id="Crime">
+                    <label class="form-check-label" for="exampleCheck1">Crime</label>
+                </div>
+                <div class="col form-check">
+                    <input type="checkbox" name="Action" value="Action" class="form-check-input" id="Action">
+                    <label class="form-check-label" for="exampleCheck1">Action</label>
+                </div>
+                <div class="col form-check">
+                    <input type="checkbox" name="Horror" value="Horror"  class="form-check-input" id="Horror">
+                    <label class="form-check-label" for="exampleCheck1">Horror</label>
+                </div>
+                <div class="col form-check">
+                    <input type="checkbox" name="Fantasy" value="Fantasy" class="form-check-input" id="Fantasy">
+                    <label class="form-check-label" for="exampleCheck1">Fantasy</label>
+                </div>
+                <div class="col form-check">
+                    <input type="checkbox" name="Documentary" value="Documentary" class="form-check-input" id="Documentary">
+                    <label class="form-check-label" for="exampleCheck1">Documentary</label>
+                </div>
+                <div class="col form-check">
+                    <input type="checkbox" name="War" value="War" class="form-check-input" id="War">
+                    <label class="form-check-label" for="exampleCheck1">War</label>
+                </div>
+            {{!-- </div> --}}
+            {{!-- <div class="row justify-content-center" style="column-count: 3;"> --}}
+                <div class="col form-check">
+                    <input type="checkbox" name="Animation" value="Animation" class="form-check-input" id="Animation">
+                    <label class="form-check-label" for="exampleCheck1">Animation</label>
+                </div>
+                <div class="col form-check">
+                    <input type="checkbox" name="Children" value="Children" class="form-check-input" id="Children">
+                    <label class="form-check-label" for="exampleCheck1">Children</label>
+                </div>
+                <div class="col form-check">
+                    <input type="checkbox" name="Adventure" value="Adventure" class="form-check-input" id="Adventure">
+                    <label class="form-check-label" for="exampleCheck1">Adventure</label>
+                </div>
+            </div>
+                
+            </form>
+            
+            <div class="row justify-content-center">
+                <ul>
+                    {{#each movieList}}
+                       {{!-- <li>{{this}}</li> --}}
+                       {{!-- <div class="card col justify-content-center">
+                           <div class="card-image justify-content-center">
+                               <img  src={{this.url}} alt={{this.name}} />
+                           </div>
+                           <div class="card-text justify-content-center">
+                               <h5>{{this.name}}</h5> 
+                           </div>
+                       </div> --}}
+
+
+                        <div class="card col justify-content-center">
+                        <img src={{this.url}} class="card-image" alt={{this.name}} style="width:100%">
+                        <div class="card-body">
+                            <h5 class="card-text">{{this.name}}</h5>
+                        </div>
+                        </div>
+
+
+
+                    {{/each}}
+                </ul>
+            </div>
+        </div>
+
+</div>

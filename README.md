@@ -1,2 +1,2 @@
-# JTP_recommender_system
+# recommender
 Final JTP project a recommendation system ready to deploy with docker

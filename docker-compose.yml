@@ -1,0 +1,18 @@
+version: "3"
+services:
+    node-app:
+        restart: always
+        build: .
+        ports:
+            - "8080:8080"
+        links: 
+            - mongo-app 
+    mongo-app:
+        # container_name: mongo
+        image: mongo
+        ports: 
+            - '27017:27017'
+    predictor:
+        build: './flask predictor model'
+        ports: 
+            - "5000:5000"

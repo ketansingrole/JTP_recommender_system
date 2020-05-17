@@ -1,0 +1,6 @@
+pandas
+scipy
+sklearn
+fuzzywuzzy
+flask
+imdbpy
