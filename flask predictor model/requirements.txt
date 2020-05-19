@@ -4,3 +4,4 @@ sklearn
 fuzzywuzzy
 flask
 imdbpy
+pymongo

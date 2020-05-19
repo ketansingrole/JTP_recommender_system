@@ -10,11 +10,52 @@ import pandas as pd
 from scipy.sparse import csr_matrix
 from sklearn.neighbors import NearestNeighbors
 import imdb
-
-
-
+import pymongo
 # utils import
 from fuzzywuzzy import fuzz
+
+# myclient = pymongo.MongoClient("mongodb://mongo-app:27017/")
+myclient = pymongo.MongoClient("mongodb://192.168.99.100:27017/")
+
+mydb = myclient["movies_database"]
+movies = mydb["movies"]
+ratings = mydb["ratings"]
+
+myquery = { "movieId": { "$exists":True }}
+
+
+movie_cursor = movies.find(myquery)
+# print ("total docs in collection:", movies.count_documents( {} ))
+# print ("total docs returned by find():", len( list(movie_cursor) ))
+# for x in movie_cursor:
+#     print(x.title)
+movies_df = pd.DataFrame(list(movie_cursor))
+
+# print("printing movies_df",movies_df)
+del movies_df['_id']
+del movies_df['genres']
+movies_df["movieId"] = pd.to_numeric(movies_df["movieId"])
+print("printing movies_df",movies_df)
+
+
+ratings_cursor = ratings.find(myquery)
+# print ("total docs in collection:", ratings.count_documents( {} ))
+# print ("total docs returned by find():", len( list(ratings_cursor) ))
+
+# ratings_df = pd.DataFrame(list(ratings_cursor))
+# print(list(ratings_cursor))
+# print("printing curser")
+# for x in ratings_cursor:
+#     print(x)
+ratings_df = pd.DataFrame(list(ratings_cursor))
+# print("printing ratings_df",ratings_df)
+del ratings_df['_id']
+del ratings_df['timestamp']
+ratings_df["userId"] = pd.to_numeric(ratings_df["userId"])
+ratings_df["movieId"] = pd.to_numeric(ratings_df["movieId"])
+ratings_df["rating"] = pd.to_numeric(ratings_df["rating"])
+# print(ratings_df)
+
 
 class KnnRecommender:
     def __init__(self, path_movies, path_ratings):
@@ -30,46 +71,44 @@ class KnnRecommender:
 
     def _prep_data(self):
         # read data
-        df_movies = pd.read_csv(
-            os.path.join(self.path_movies),
-            usecols=['movieId', 'title'],
-            dtype={'movieId': 'int32', 'title': 'str'})
+        # df_movies = pd.read_csv(os.path.join(self.path_movies),usecols=['movieId', 'title'],dtype={'movieId': 'int32', 'title': 'str'})
 
-            #reading csv and passing data to use the coulmn
-        df_ratings = pd.read_csv(
-            os.path.join(self.path_ratings),
-            usecols=['userId', 'movieId', 'rating'],
-            dtype={'userId': 'int32', 'movieId': 'int32', 'rating': 'float32'})
+        # print(df_movies.dtypes)
+
+        # #reading csv and passing data to use the coulmn
+        # df_ratings = pd.read_csv(os.path.join(self.path_ratings),usecols=['userId', 'movieId', 'rating'],dtype={'userId': 'int32', 'movieId': 'int32', 'rating': 'float32'})
+
+        # print(ratings_df)
         # filter data
-        df_movies_cnt = pd.DataFrame(
-            df_ratings.groupby('movieId').size(),
-            columns=['count'])
+        df_movies_cnt = pd.DataFrame(ratings_df.groupby('movieId').size(),columns=['count'])
+        # df_movies_cnt = pd.DataFrame(df_ratings.groupby('movieId').size(),columns=['count'])
+
+
+        # print(df_movies_cnt)
+        
         popular_movies = list(set(df_movies_cnt.query('count >= @self.movie_rating_thres').index))  # noqa
-        movies_filter = df_ratings.movieId.isin(popular_movies).values
+        movies_filter = ratings_df.movieId.isin(popular_movies).values
 
-        df_users_cnt = pd.DataFrame(
-            df_ratings.groupby('userId').size(),
-            columns=['count'])
+        df_users_cnt = pd.DataFrame(ratings_df.groupby('userId').size(),columns=['count'])
+
         active_users = list(set(df_users_cnt.query('count >= @self.user_rating_thres').index))  # noqa
-        users_filter = df_ratings.userId.isin(active_users).values
+        users_filter = ratings_df.userId.isin(active_users).values
 
-        df_ratings_filtered = df_ratings[movies_filter & users_filter]
+        df_ratings_filtered = ratings_df[movies_filter & users_filter]
 
         # pivot and create movie-user matrix
-        movie_user_mat = df_ratings_filtered.pivot(
-            index='movieId', columns='userId', values='rating').fillna(0)
+        movie_user_mat = df_ratings_filtered.pivot(index='movieId', columns='userId', values='rating').fillna(0)
         # create mapper from movie title to index
-        hashmap = {
-            movie: i for i, movie in
-            enumerate(list(df_movies.set_index('movieId').loc[movie_user_mat.index].title)) # noqa
+        hashmap = { movie: i for i, movie in
+            enumerate(list(movies_df.set_index('movieId').loc[movie_user_mat.index].title)) # noqa
         }
         # transform matrix to scipy sparse matrix
         movie_user_mat_sparse = csr_matrix(movie_user_mat.values)
 
         # clean up
-        del df_movies, df_movies_cnt, df_users_cnt
-        del df_ratings, df_ratings_filtered, movie_user_mat
-        gc.collect()
+        # del df_movies, df_movies_cnt, df_users_cnt
+        # del df_ratings, df_ratings_filtered, movie_user_mat
+        # gc.collect()
         # print("Movie user sparse matrix \n",movie_user_mat_sparse)
         # print("Hashmap \n",hashmap)
         return movie_user_mat_sparse, hashmap
