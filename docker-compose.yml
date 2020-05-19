@@ -9,11 +9,15 @@ services:
             - mongo-app 
     mongo-app:
         # container_name: mongo
-        image: mongo
-        volumes: 
-            - ./mongo-volume:/data/db
+        image: mongo:latest
         ports: 
             - '27017:27017'
+
+    mongo-seed:
+        build: './mongo-seed'
+        links:
+            - mongo-app
+
     predictor:
         build: './flask predictor model'
         ports: 
