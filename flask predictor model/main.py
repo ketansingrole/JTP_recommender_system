@@ -20,8 +20,10 @@ myclient = pymongo.MongoClient("mongodb://mongo-app:27017/")
 mydb = myclient["movies_database"]
 movies = mydb["movies"]
 ratings = mydb["ratings"]
+links = mydb["links"]
 
 myquery = { "movieId": { "$exists":True }}
+
 
 
 movie_cursor = movies.find(myquery)
@@ -35,7 +37,7 @@ movies_df = pd.DataFrame(list(movie_cursor))
 del movies_df['_id']
 del movies_df['genres']
 movies_df["movieId"] = pd.to_numeric(movies_df["movieId"])
-print("printing movies_df",movies_df)
+# print("printing movies_df",movies_df)
 
 
 ratings_cursor = ratings.find(myquery)
@@ -160,9 +162,7 @@ class KnnRecommender:
         print('Recommendation system start to make inference')
         print('......\n')
         t0 = time.time()
-        distances, indices = model.kneighbors(
-            data[idx],
-            n_neighbors=n_recommendations+1)
+        distances, indices = model.kneighbors(data[idx],n_neighbors=n_recommendations+1)
         # get list of raw idx of recommendations
         raw_recommends = \
             sorted(
@@ -183,9 +183,7 @@ class KnnRecommender:
         # get data
         movie_user_mat_sparse, hashmap = self._prep_data()
         # get recommendations
-        raw_recommends = self._inference(
-            self.model, movie_user_mat_sparse, hashmap,
-            fav_movie, n_recommendations)
+        raw_recommends = self._inference(self.model, movie_user_mat_sparse, hashmap,fav_movie, n_recommendations)
         # print(raw_recommends)
         # print results
         reverse_hashmap = {v: k for k, v in hashmap.items()}
@@ -230,16 +228,32 @@ def predict():
             print("filter list is empty")
             finalString = []
             for i in recomendations_list[-5:]:
+                tempQuery = { "name": i}
+                links_cursor = links.find(tempQuery)
+                print ("total docs in collection:", links.count_documents( {} ))
+                print ("total docs returned by find():", len( list(links_cursor) ))
+                print(links_cursor)
+                x = links.find_one(tempQuery)
+                print(x['name'])
+                tempQuery = { "name": i}
+                links_cursor = links.find(myquery)
                 imageUrls = {}
-                access = imdb.IMDb()
-                search_results = access.search_movie(i)
-                movieID = search_results[0].movieID
-                movie = access.get_movie(movieID)
+                # access = imdb.IMDb()
+                # search_results = access.search_movie(i)
+                # movieID = search_results[0].movieID
+                # movie = access.get_movie(movieID)
 
-                print (movie['title'], movie['year'])
-                print (movie['cover url'])
+                # print (movie['title'], movie['year'])
+                # print (movie['cover url'])
                 imageUrls["name"] = i
-                imageUrls["url"] = (movie['cover url'])
+
+                # for x in links_cursor:
+                #     print(x.name)
+                # for x in links_cursor:
+                #     imageUrls["url"] = x['url']
+                imageUrls["url"] = x['url']
+                print(x['url'])
+                # imageUrls["url"] = (movie['cover url'])
                 finalString.append(imageUrls)
         else:
             print("filter list is not empty")
@@ -257,16 +271,33 @@ def predict():
             print(filter_recommendations[-5:])
             for i in filter_recommendations[-5:]:
                 try:
-                    imageUrls = {}
-                    access = imdb.IMDb()
-                    search_results = access.search_movie(i)
-                    movieID = search_results[0].movieID
-                    movie = access.get_movie(movieID)
+                    tempQuery = { "name": i}
+                    links_cursor = links.find(tempQuery)
+                    print ("total docs in collection:", links.count_documents( {} ))
+                    print ("total docs returned by find():", len( list(links_cursor) ))
+                    print(links_cursor)
+                    x = links.find_one(tempQuery)
+                    print(x['name'])
 
-                    print (movie['title'], movie['year'])
-                    print (movie['cover url'])
+                    imageUrls = {}
+                    # access = imdb.IMDb()
+                    # search_results = access.search_movie(i)
+                    # movieID = search_results[0].movieID
+                    # movie = access.get_movie(movieID)
+
+                    # print (movie['title'], movie['year'])
+                    # print (movie['cover url'])
+                    for x in links_cursor:
+                        print(x.name)
+                    print("debug")
                     imageUrls["name"] = i
-                    imageUrls["url"] = (movie['cover url'])
+                    # imageUrls["url"] = (movie['cover url'])
+                    # print(links_cursor.url)
+                    # for x in links_cursor:
+                    #     imageUrls["url"] = x['url']
+                    imageUrls["url"] = x['url']
+                    print(x['url'])
+                    # imageUrls["url"] = (movie['cover url'])
                     finalString.append(imageUrls)
                 except Exception as e:
                     print(e)
