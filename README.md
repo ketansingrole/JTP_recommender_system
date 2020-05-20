@@ -9,9 +9,9 @@ Steps to run the project:
 5. Go to browser and search for `localhost:8080` for Mac and Linux
 6. Go to `http://192.168.99.100:8080/` for Windows
 
-	# Top list of highly rated movies
-  Forrest Gump (1994)
-  Shawshank Redemption, The (1994)
-  Matrix, The (1999)
-  Toy Story (1995)
-  Jumanji (1995)
+# List of top rated movies
+ 1. Forrest Gump (1994)
+ 2. Shawshank Redemption, The (1994)
+ 3. Matrix, The (1999)
+ 4. Toy Story (1995)
+ 5. Jumanji (1995)
