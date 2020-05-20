@@ -86,7 +86,11 @@ class KnnRecommender:
         # df_movies_cnt = pd.DataFrame(df_ratings.groupby('movieId').size(),columns=['count'])
 
 
-        # print(df_movies_cnt)
+        print(df_movies_cnt)
+        temp = df_movies_cnt.sort_values(by ='count',ascending=False )
+        temp.to_csv('Top_Rated_movies.csv')
+        
+
         
         popular_movies = list(set(df_movies_cnt.query('count >= @self.movie_rating_thres').index))  # noqa
         movies_filter = ratings_df.movieId.isin(popular_movies).values
