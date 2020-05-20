@@ -14,49 +14,6 @@ import pymongo
 # utils import
 from fuzzywuzzy import fuzz
 
-myclient = pymongo.MongoClient("mongodb://mongo-app:27017/")
-# myclient = pymongo.MongoClient("mongodb://192.168.99.100:27017/")
-
-mydb = myclient["movies_database"]
-movies = mydb["movies"]
-ratings = mydb["ratings"]
-links = mydb["links"]
-
-myquery = { "movieId": { "$exists":True }}
-
-
-
-movie_cursor = movies.find(myquery)
-# print ("total docs in collection:", movies.count_documents( {} ))
-# print ("total docs returned by find():", len( list(movie_cursor) ))
-# for x in movie_cursor:
-#     print(x.title)
-movies_df = pd.DataFrame(list(movie_cursor))
-
-# print("printing movies_df",movies_df)
-del movies_df['_id']
-del movies_df['genres']
-movies_df["movieId"] = pd.to_numeric(movies_df["movieId"])
-# print("printing movies_df",movies_df)
-
-
-ratings_cursor = ratings.find(myquery)
-# print ("total docs in collection:", ratings.count_documents( {} ))
-# print ("total docs returned by find():", len( list(ratings_cursor) ))
-
-# ratings_df = pd.DataFrame(list(ratings_cursor))
-# print(list(ratings_cursor))
-# print("printing curser")
-# for x in ratings_cursor:
-#     print(x)
-ratings_df = pd.DataFrame(list(ratings_cursor))
-# print("printing ratings_df",ratings_df)
-del ratings_df['_id']
-del ratings_df['timestamp']
-ratings_df["userId"] = pd.to_numeric(ratings_df["userId"])
-ratings_df["movieId"] = pd.to_numeric(ratings_df["movieId"])
-ratings_df["rating"] = pd.to_numeric(ratings_df["rating"])
-# print(ratings_df)
 
 
 class KnnRecommender:
@@ -72,6 +29,49 @@ class KnnRecommender:
         self.user_rating_thres = user_rating_thres
 
     def _prep_data(self):
+        myclient = pymongo.MongoClient("mongodb://mongo-app:27017/")
+        # myclient = pymongo.MongoClient("mongodb://192.168.99.100:27017/")
+
+        mydb = myclient["movies_database"]
+        movies = mydb["movies"]
+        ratings = mydb["ratings"]
+        links = mydb["links"]
+
+        myquery = { "movieId": { "$exists":True }}
+
+
+
+        movie_cursor = movies.find(myquery)
+        # print ("total docs in collection:", movies.count_documents( {} ))
+        # print ("total docs returned by find():", len( list(movie_cursor) ))
+        # for x in movie_cursor:
+        #     print(x.title)
+        movies_df = pd.DataFrame(list(movie_cursor))
+
+        # print("printing movies_df",movies_df)
+        del movies_df['_id']
+        del movies_df['genres']
+        movies_df["movieId"] = pd.to_numeric(movies_df["movieId"])
+        # print("printing movies_df",movies_df)
+
+
+        ratings_cursor = ratings.find(myquery)
+        # print ("total docs in collection:", ratings.count_documents( {} ))
+        # print ("total docs returned by find():", len( list(ratings_cursor) ))
+
+        # ratings_df = pd.DataFrame(list(ratings_cursor))
+        # print(list(ratings_cursor))
+        # print("printing curser")
+        # for x in ratings_cursor:
+        #     print(x)
+        ratings_df = pd.DataFrame(list(ratings_cursor))
+        # print("printing ratings_df",ratings_df)
+        del ratings_df['_id']
+        del ratings_df['timestamp']
+        ratings_df["userId"] = pd.to_numeric(ratings_df["userId"])
+        ratings_df["movieId"] = pd.to_numeric(ratings_df["movieId"])
+        ratings_df["rating"] = pd.to_numeric(ratings_df["rating"])
+        # print(ratings_df)
         # read data
         # df_movies = pd.read_csv(os.path.join(self.path_movies),usecols=['movieId', 'title'],dtype={'movieId': 'int32', 'title': 'str'})
 
@@ -209,6 +209,11 @@ def hello_world():
 @app.route('/predict',methods=['GET', 'POST'])
 def predict():
     try:
+        myclient = pymongo.MongoClient("mongodb://mongo-app:27017/")
+        # myclient = pymongo.MongoClient("mongodb://192.168.99.100:27017/")
+        mydb = myclient["movies_database"]
+        links = mydb["links"]
+
         filter_list = []
         movieName = request.args.get('movieName')
         filter_list = request.args.get('filter_list').split(",")

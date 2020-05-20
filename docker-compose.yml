@@ -2,11 +2,14 @@ version: "3"
 services:
     node-app:
         restart: always
+        depends_on: 
+            - predictor
         build: .
         ports:
             - "8080:8080"
         links: 
             - mongo-app 
+            - predictor
     mongo-app:
         # container_name: mongo
         image: mongo:latest
@@ -19,8 +22,12 @@ services:
             - mongo-app
 
     predictor:
+        restart: always
+        depends_on: 
+            - mongo-seed
         build: './flask predictor model'
         ports: 
             - "5000:5000"
         links:  
             - mongo-app
+            - mongo-seed
